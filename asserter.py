@@ -28,8 +28,8 @@ class Asserter(object):
     def __repr__(self):
         return "wrapped({})".format(repr(self.obj))
     
-    def __call__(self):
-        return type(self)(self.obj())
+    def __call__(self, *args, **kwargs):
+        return type(self)(self.obj(*args, **kwargs))
 
     def __getitem__(self, item):
         return type(self)(self.obj[item])
@@ -49,11 +49,11 @@ class Asserter(object):
             raise AssertionError("{} is {} -> False".format(self.obj, other))
         return result
 
-    def __instancecheck__(self, cls):
-        return isinstance(self.obj, cls)
-
-    def __subclasscheck__(self, cls):
-        return issubclass(type(self.obj), cls)
+    def isinstance(self, cls):
+        result = isinstance(self.obj, cls)
+        if not result:
+            raise AssertionError("{} is not an instance of {}".format(self.obj, cls))
+        return result
 
 from contextlib import contextmanager
 
@@ -64,35 +64,5 @@ def assert_raises(exception=AssertionError):
     except exception:
         pass
     else:
-        assert False, "{} not raise".format(exception)
-
-def test():
-    num = Asserter(1)
-    num < 2
-    num > 0
-    num == 1
-    num.is_(1)
-    with assert_raises():
-        num <= 0
-    with assert_raises():
-        num == 2
-
-    d = Asserter(dict(a=3))
-    'a' in d 
-    d['a'] == 3
-    with assert_raises():
-        'b' in d
-    with assert_raises():
-        d['a'] == 4
-    
-    l = Asserter(range(10))
-    
-    l.length() == 10
-    with assert_raises():
-        l.length() == 9
-    
-
-if __name__ == '__main__':
-    test()
-        
+        assert False, "{} not raise".format(exception)        
     

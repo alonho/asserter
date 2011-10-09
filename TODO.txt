@@ -1,0 +1,3 @@
+isinstance, issubclass - metaclass assiging __bases__?
+len - probably not solvable (len() implemented in C is converting __len__ to int)
+is - not solvable!!
